@@ -3,7 +3,8 @@ services:
     api:
         build: .
         depends_on:
-            - postgres
+            postgres:
+                condition: service_healthy
         ports:
             - 8000:8000
         volumes:
@@ -25,6 +26,11 @@ services:
         environment:
             - POSTGRES_PASSWORD=admin
             - POSTGRES_DB=fastapi
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres -d fastapi"]
+            interval: 5s
+            timeout: 10s
+            retries: 5
         volumes:
             - postgres-db:/var/lib/postgresql/data
 volumes:
